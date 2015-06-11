@@ -1,0 +1,104 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<polymer-element name="yuni-carousel">
+  <template>
+	  <style>
+		  ul, ol {
+			  list-style: none;
+		  }  
+
+		  .slides {
+			  position: relative;
+			  display: inline-block;
+		  }
+
+		  .slide {
+			  transition: 1s ease-in opacity;
+			  position: absolute;
+			  top: 0;
+			  left: 0;
+			  opacity: 0;
+		  }
+
+		  .trigger {
+			  display: none;
+		  }
+
+		  .trigger:checked + .slide {
+			  position: relative;
+			  opacity: 1;
+		  }
+		  
+		  .navigation {
+			  position: absolute;
+			  bottom: 1em;
+			  right: 1em;
+			  z-index: 1;
+		  }
+		  
+		  .navigation label:before {
+			  content: "";
+			  cursor: pointer;
+			  background-color: rgba(255,255,255,0.8);
+			  box-shadow: 0px 0px 5px rgba(0,0,0,.5);
+			  display: inline-block;
+			  border-radius: 50%;
+			  margin-left: 10px;
+			  height: 0.8em;
+			  width: 0.8em;
+		  }
+	  </style>
+	  <section class="slides">
+		  <template repeat="{{slide, index in slides}}">
+			  <input type="radio" class="trigger" name="slides" id="slide-{{index}}" />
+			  <img src="{{slide}}" class="slide" />
+		  </template>
+		  <section class="navigation">
+			  <template repeat="{{slide, index in slides}}">
+				 <label for="slide-{{index}}"></label>
+			  </template>
+		  </section>
+	  </section>
+  </template>
+  <script>
+  
+    Polymer("yuni-carousel", {
+		created: function() {
+			this.slides = [
+				"http://lorempixel.com/960/200/animals",
+				"http://lorempixel.com/960/200/animals?1",
+				"http://lorempixel.com/960/200/animals?2",
+				"http://lorempixel.com/960/200/animals?3",
+				"http://lorempixel.com/960/200/animals?4"
+			];
+		},
+		domReady: function() {
+			var root = this.shadowRoot,
+				slides = root.querySelectorAll(".trigger"),
+				index = 0,
+				size = slides.length;
+			
+			slides[index].checked = true;
+			
+			setInterval(function() {
+				var current = root.querySelector(".trigger:checked"),
+					currentIndex = Array.prototype.indexOf.call(slides, current);
+				
+				current.checked = false;
+				index = index % size != currentIndex? currentIndex : ++index;
+				slides[index % size].checked = true;
+			}, 3000);
+			
+			var style = document.createElement("style");
+			root.appendChild(style);
+			var sheet = style.sheet;
+			
+			for(i in slides) {
+				var selector = "#slide-" + i + ":checked ~ .navigation label[for=slide-" + i + "]:before";
+				sheet.addRule(selector, "background-color: orange;");
+			}
+			
+		}
+    });
+  </script>
+</polymer-element>
+
